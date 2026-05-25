@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.2.0/chartjs-plugin-zoom.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="map.css">
+    <title>Server Map</title>
+</head>
+
+<body>
+    <div id="page">
+        <div id="message">
+            Data gathered on <span id="date">unknown date</span>.<br />
+            Mouse scroll to zoom.<br />
+            Click label to hide category.<br />
+            <button type="button" onclick="stars.resetZoom();">Click me to reset zoom</button>
+        </div>
+        <div id="container">
+            <canvas id="universe"></canvas>
+        </div>
+    </div>
+    <script>
+        document.getElementById("date").innerHTML = new Date(STAR_DATE * 1000).toLocaleString();
+        const data = {
+            datasets: [
+                {
+                    label: "Settlements",
+                    data: STAR_BASE,
+                    backgroundColor: "magenta"
+                },
+                {
+                    label: "Corrupted Star Systems",
+                    data: STAR_BAD,
+                    backgroundColor: "red"
+                },
+                {
+                    label: "Visited Star Systems",
+                    data: STAR_GOOD,
+                    backgroundColor: "white"
+                }]
+        };
+        const axes_config = {
+            border: {
+                color: "white"
+            },
+            grid: {
+                color: "#111111"
+            },
+            suggestedMin: -1000000000,
+            suggestedMax: 1000000000,
+            ticks: {
+                callback: function (value, index, array) {
+                    let abs_value = Math.abs(value);
+                    switch (true) {
+                        case (abs_value < 1000):
+                            return value;
+                        default:
+                            return Math.floor(value / 1000) + "K";
+                    }
+                }
+            }
+        }
+        const config = {
+            type: "bubble",
+            data: data,
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    x: axes_config,
+                    y: axes_config
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: (context) => {
+                                let ret = [];
+                                context.forEach(item => {
+                                    if (item.raw.text) {
+                                        ret.push(item.raw.text);
+                                    }
+                                });
+                                return ret;
+                            },
+                            label: (context) => {
+                                let ret = [
+                                    `X Coord: ${context.raw.x}`,
+                                    `Y Coord: ${context.raw.y}`,
+                                    `Planets: ${context.raw.r}`
+                                ];
+                                return ret;
+                            }
+                        }
+                    },
+                    zoom: {
+                        zoom: {
+                            wheel: {
+                                enabled: true,
+                                speed: 0.2
+                            },
+                            drag: {
+                                enabled: false
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            pan: {
+                                enabled: true
+                            },
+                            mode: "xy"
+                        },
+                        limits: {
+                            x: { min: -1000000000, max: 1000000000 },
+                            y: { min: -1000000000, max: 1000000000 }
+                        }
+                    }
+                }
+
+            }
+        };
+        let stars = new Chart(document.getElementById("universe"), config);
+    </script>
+</body>
+
+</html>

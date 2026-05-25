@@ -1,0 +1,29 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+#page, #universe {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#page {
+    min-height: 100vh;
+    background-color: black;
+}
+
+#container {
+    background-color: black;
+    width: 100vmin;
+    height: 100vmin;
+}
+
+#message {
+    position: absolute;
+    z-index: 100;
+    left: 5%;
+    top: 5%;
+    color: white;
+}
